@@ -1,0 +1,7 @@
+pandas==2.1.0
+numpy==1.25.2
+matplotlib==3.7.2
+seaborn==0.12.2
+spotipy==2.23.0
+scikit-learn==1.5.0
+python-dotenv==1.0.0
