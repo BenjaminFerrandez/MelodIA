@@ -1,47 +1,15 @@
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-import os
 import pandas as pd
-from config import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI, DATA_DIR
-
-# Étendre la portée pour inclure les autorisations nécessaires
-SPOTIFY_TOP_SCOPE = "user-library-read user-top-read playlist-read-private playlist-modify-private user-read-recently-played"
-
+import os
+from config import DATA_DIR
+from spotify_auth import SpotifyAuth
 
 class TopArtistsAnalyzer:
     def __init__(self, force_new_auth=False):
         """Initialise l'analyseur des artistes les plus écoutés"""
-        cache_path = os.path.join(DATA_DIR, ".spotify_cache_top")
-
-        # Si on force une nouvelle authentification, supprimer le cache existant
-        if force_new_auth and os.path.exists(cache_path):
-            try:
-                os.remove(cache_path)
-                print("Cache d'authentification précédent supprimé.")
-            except Exception as e:
-                print(f"Impossible de supprimer le cache: {e}")
-
-        # Authentification avec des permissions étendues
-        auth_manager = SpotifyOAuth(
-            client_id=SPOTIFY_CLIENT_ID,
-            client_secret=SPOTIFY_CLIENT_SECRET,
-            redirect_uri=SPOTIFY_REDIRECT_URI,
-            scope=SPOTIFY_TOP_SCOPE,
-            cache_path=cache_path,
-            show_dialog=force_new_auth
-        )
-
-        self.sp = spotipy.Spotify(auth_manager=auth_manager)
-
-        # Récupérer les informations de l'utilisateur
-        try:
-            user_info = self.sp.current_user()
-            self.user_id = user_info['id']
-            self.user_name = user_info.get('display_name', self.user_id)
-            print(f"Connecté à Spotify en tant que: {self.user_name} ({self.user_id})")
-        except Exception as e:
-            print(f"Erreur lors de la récupération des informations utilisateur: {e}")
-            raise
+        auth = SpotifyAuth.get_instance(force_new_auth)
+        self.sp = auth.get_spotify_client()
+        self.user_id = auth.user_id
+        self.user_name = auth.user_name
 
     def get_top_artists(self, time_range='medium_term', limit=10):
         """

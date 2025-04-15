@@ -1,50 +1,16 @@
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
 import pandas as pd
 import time
-from config import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI, SPOTIFY_SCOPE, DATA_DIR
 import os
-
+from config import DATA_DIR
+from spotify_auth import SpotifyAuth
 
 class SpotifyConnector:
     def __init__(self, force_new_auth=False):
-        """
-        Initialise la connexion à l'API Spotify
-
-        Parameters:
-            force_new_auth (bool): Si True, force une nouvelle authentification en ignorant le cache
-        """
-        cache_path = os.path.join(DATA_DIR, ".spotify_cache")
-
-        # Si on force une nouvelle authentification, supprimer le cache existant
-        if force_new_auth and os.path.exists(cache_path):
-            try:
-                os.remove(cache_path)
-                print("Cache d'authentification précédent supprimé.")
-            except Exception as e:
-                print(f"Impossible de supprimer le cache: {e}")
-
-        # Création du gestionnaire d'authentification
-        auth_manager = SpotifyOAuth(
-            client_id=SPOTIFY_CLIENT_ID,
-            client_secret=SPOTIFY_CLIENT_SECRET,
-            redirect_uri=SPOTIFY_REDIRECT_URI,
-            scope=SPOTIFY_SCOPE,
-            cache_path=cache_path,
-            show_dialog=force_new_auth  # Forcer l'affichage de la boîte de dialogue de connexion
-        )
-
-        self.sp = spotipy.Spotify(auth_manager=auth_manager)
-
-        # Récupérer les informations de l'utilisateur pour confirmer l'authentification
-        try:
-            user_info = self.sp.current_user()
-            self.user_id = user_info['id']
-            self.user_name = user_info.get('display_name', self.user_id)
-            print(f"Connecté à Spotify en tant que: {self.user_name} ({self.user_id})")
-        except Exception as e:
-            print(f"Erreur lors de la récupération des informations utilisateur: {e}")
-            raise
+        """Initialise la connexion à l'API Spotify"""
+        auth = SpotifyAuth.get_instance(force_new_auth)
+        self.sp = auth.get_spotify_client()
+        self.user_id = auth.user_id
+        self.user_name = auth.user_name
 
     def get_playlists(self):
         """Récupère toutes les playlists de l'utilisateur"""

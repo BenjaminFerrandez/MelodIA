@@ -12,6 +12,7 @@ from data_analysis import analyze_data
 from visualization import create_visualizations
 from recommendation import get_recommendations
 from top_artists import analyze_top_artists, TopArtistsAnalyzer
+from spotify_auth import SpotifyAuth
 
 
 def print_header(message):
@@ -88,39 +89,22 @@ def clear_data():
 
 def logout_spotify():
     """Déconnecte l'utilisateur de Spotify en supprimant le fichier cache et les jetons d'authentification"""
-    # Chemins des fichiers de cache Spotify
-    cache_path = os.path.join(DATA_DIR, ".spotify_cache")
-    cache_files = [
-        cache_path,
-        # Chercher d'autres fichiers de cache possibles dans le répertoire de données
-        *[os.path.join(DATA_DIR, f) for f in os.listdir(DATA_DIR) if '.cache' in f]
-    ]
+    # Utiliser la méthode de déconnexion de la classe SpotifyAuth
+    try:
+        auth = SpotifyAuth.get_instance()
+        success = auth.logout()
 
-    deleted = False
-    for file_path in cache_files:
-        if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-                print(f"Fichier cache supprimé: {os.path.basename(file_path)}")
-                deleted = True
-            except Exception as e:
-                print(f"Erreur lors de la suppression de {file_path}: {e}")
-
-    # Chercher et supprimer les jetons dans le répertoire courant aussi
-    for file in os.listdir(os.path.dirname(os.path.abspath(__file__))):
-        if '.cache' in file:
-            try:
-                os.remove(os.path.join(os.path.dirname(os.path.abspath(__file__)), file))
-                print(f"Fichier cache supprimé: {file}")
-                deleted = True
-            except Exception as e:
-                print(f"Erreur lors de la suppression de {file}: {e}")
-
-    if deleted:
-        print("\nDéconnexion réussie. Vous devrez vous authentifier à nouveau lors de la prochaine extraction.")
-        return True
-    else:
-        print("\nAucune session active trouvée.")
+        if success:
+            print("\nDéconnexion réussie. Vous devrez vous authentifier à nouveau lors de la prochaine extraction.")
+            print("\nNOTE: Pour révoquer complètement l'accès de l'application à votre compte Spotify,")
+            print("veuillez vous rendre sur le site de Spotify (https://www.spotify.com/account/apps/)")
+            print("et révoquer l'accès dans la section 'Applications'.")
+            return True
+        else:
+            print("\nProblème lors de la déconnexion. Veuillez vérifier si une session est active.")
+            return False
+    except Exception as e:
+        print(f"Erreur lors de la déconnexion: {e}")
         return False
 
 
@@ -329,18 +313,27 @@ def main():
 
     # Menu principal
     while True:
-        print("\nQue souhaitez-vous faire?")
+        print("\n=== ANALYSEUR ET GÉNÉRATEUR DE PLAYLISTS MUSICALES ===")
+
+        print("\n>> GESTION DES DONNÉES:")
         print("1. Extraire les données de Spotify")
         print("2. Nettoyer et traiter les données")
         print("3. Analyser les données")
         print("4. Créer des visualisations")
+
+        print("\n>> RECOMMANDATIONS ET PLAYLISTS:")
         print("5. Tester le système de recommandation")
-        print("6. Exécuter tout le pipeline")
-        print("7. Se déconnecter du compte Spotify")
-        print("8. Effacer toutes les données et recommencer")
-        print("9. Forcer une nouvelle connexion Spotify")
-        print("10. Voir vos artistes les plus écoutés et créer une playlist")
-        print("0. Quitter")
+        print("6. Voir vos artistes les plus écoutés et créer une playlist")
+
+        print("\n>> ACTIONS GLOBALES:")
+        print("7. Exécuter tout le pipeline de données")
+
+        print("\n>> COMPTE ET SESSION:")
+        print("8. Se connecter/Forcer une nouvelle connexion Spotify")
+        print("9. Se déconnecter du compte Spotify")
+        print("10. Effacer toutes les données et recommencer")
+
+        print("\n0. Quitter")
 
         choice = input("\nVotre choix (0-10): ")
 
@@ -355,6 +348,8 @@ def main():
         elif choice == '5':
             run_recommendation_demo()
         elif choice == '6':
+            run_top_artists_analysis()
+        elif choice == '7':
             # Exécuter toutes les étapes
             if run_extraction_process():
                 time.sleep(1)
@@ -365,23 +360,17 @@ def main():
                         run_visualization_step()
                         time.sleep(1)
                         run_recommendation_demo()
-        elif choice == '7':
+        elif choice == '8':
+            # Forcer une nouvelle connexion
+            print("Forçage d'une nouvelle connexion Spotify...")
+            run_extraction_process(force_new_auth=True)
+        elif choice == '9':
             # Se déconnecter de Spotify
             logout_spotify()
-        elif choice == '8':
+        elif choice == '10':
             # Effacer toutes les données
             if input("Êtes-vous sûr de vouloir supprimer toutes les données? (o/n): ").lower() == 'o':
                 clear_data()
-        elif choice == '9':
-            # Forcer une nouvelle connexion
-            print("Forçage d'une nouvelle connexion Spotify...")
-            # D'abord déconnecter
-            logout_spotify()
-            # Puis forcer une nouvelle connexion
-            run_extraction_process(force_new_auth=True)
-        elif choice == '10':
-            # Analyser les artistes les plus écoutés
-            run_top_artists_analysis(force_new_auth=False)
         elif choice == '0':
             print("\nMerci d'avoir utilisé l'analyseur de playlists musicales!")
             sys.exit(0)
