@@ -3,7 +3,10 @@ import pandas as pd
 import os
 import numpy as np
 import plotly.express as px
+import plotly.graph_objects as go
 from config import DATA_DIR
+
+# Importer uniquement get_recommendations, PAS export_playlist_to_csv
 from recommendation import get_recommendations
 
 
@@ -31,20 +34,28 @@ def show():
 
         return
 
-    # Charger les données catégorisées
-    df = pd.read_csv(categorized_path)
+    try:
+        # Charger les données catégorisées
+        df = pd.read_csv(categorized_path, low_memory=False)
 
-    # Créer des onglets pour différents types de recommandations
-    tab1, tab2, tab3 = st.tabs(["Par titre", "Par ambiance", "Découvertes"])
+        if df.empty:
+            st.error("Le fichier de données existe mais ne contient aucune donnée valide.")
+            return
 
-    with tab1:
-        show_similar_tracks_recommendations(df)
+        # Créer des onglets pour différents types de recommandations
+        tab1, tab2, tab3 = st.tabs(["Par titre", "Par ambiance", "Découvertes"])
 
-    with tab2:
-        show_mood_based_recommendations(df)
+        with tab1:
+            show_similar_tracks_recommendations(df)
 
-    with tab3:
-        show_discovery_recommendations(df)
+        with tab2:
+            show_mood_based_recommendations(df)
+
+        with tab3:
+            show_discovery_recommendations(df)
+
+    except Exception as e:
+        st.error(f"Erreur lors du chargement des recommandations: {str(e)}")
 
 
 def show_similar_tracks_recommendations(df):
@@ -139,6 +150,20 @@ def show_similar_tracks_recommendations(df):
                             # Option pour créer une playlist Spotify
                             if st.button("Créer une playlist Spotify avec ces titres", type="secondary"):
                                 st.warning("Fonctionnalité de création de playlist en cours de développement")
+
+                            # Option pour exporter en CSV avec importation différée
+                            if st.button("Exporter en CSV", type="secondary"):
+                                try:
+                                    # Importation différée de export_playlist_to_csv
+                                    from spotify_playlist_export import export_playlist_to_csv
+                                    export_path = export_playlist_to_csv(
+                                        similar_tracks,
+                                        f"similar_to_{track_name.replace(' ', '_')}"
+                                    )
+                                    if export_path:
+                                        st.success(f"Playlist exportée: {os.path.basename(export_path)}")
+                                except Exception as e:
+                                    st.error(f"Erreur lors de l'exportation: {str(e)}")
                     else:
                         st.error("Aucune recommandation n'a pu être générée. Veuillez essayer un autre titre.")
 
@@ -185,7 +210,14 @@ def show_mood_based_recommendations(df):
     if st.button(f"Générer une playlist {moods[selected_mood]}", type="primary"):
         with st.spinner(f"Création d'une playlist {moods[selected_mood]}..."):
             # Obtenir les recommandations
-            mood_playlist = get_recommendations(mood=selected_mood, size=playlist_size)
+            mood_playlist = get_recommendations(
+                mood=selected_mood,
+                size=playlist_size,
+                min_energy=min_energy,
+                min_danceability=min_danceability,
+                min_valence=min_valence,
+                max_acousticness=max_acousticness
+            )
 
             if mood_playlist is not None and not mood_playlist.empty:
                 st.success(f"Voici votre playlist {moods[selected_mood]} avec {len(mood_playlist)} titres")
@@ -221,6 +253,20 @@ def show_mood_based_recommendations(df):
                 # Option pour créer une playlist Spotify
                 if st.button("Créer cette playlist sur Spotify", type="secondary"):
                     st.warning("Fonctionnalité de création de playlist en cours de développement")
+
+                # Option pour exporter en CSV avec importation différée
+                if st.button("Exporter en CSV", type="secondary"):
+                    try:
+                        # Importation différée de export_playlist_to_csv
+                        from spotify_playlist_export import export_playlist_to_csv
+                        export_path = export_playlist_to_csv(
+                            mood_playlist,
+                            f"playlist_{selected_mood}"
+                        )
+                        if export_path:
+                            st.success(f"Playlist exportée: {os.path.basename(export_path)}")
+                    except Exception as e:
+                        st.error(f"Erreur lors de l'exportation: {str(e)}")
             else:
                 st.error("Aucune recommandation n'a pu être générée. Veuillez ajuster les paramètres et réessayer.")
 
@@ -246,8 +292,16 @@ def show_discovery_recommendations(df):
 
     if st.button("Découvrir de nouveaux titres", type="primary"):
         with st.spinner("Recherche de découvertes musicales..."):
+            # Convertir le type de découverte en valeur pour la fonction
+            discovery_type_map = {
+                "Artistes peu écoutés": "artists",
+                "Titres populaires que vous ne connaissez pas": "popular",
+                "Mélange varié": "mixed"
+            }
+            discovery_type_value = discovery_type_map.get(discovery_type, "mixed")
+
             # Obtenir les recommandations de découvertes
-            discoveries = get_recommendations(discover=True, size=discovery_size)
+            discoveries = get_recommendations(discover=True, size=discovery_size, discovery_type=discovery_type_value)
 
             if discoveries is not None and not discoveries.empty:
                 st.success(f"Voici {len(discoveries)} découvertes musicales pour vous")
@@ -255,6 +309,7 @@ def show_discovery_recommendations(df):
                 # Afficher les résultats
                 results_df = discoveries[['track_name', 'artist_name']]
 
+                # Ajouter popularité si disponible
                 if 'popularity' in discoveries.columns:
                     results_df['popularity'] = discoveries['popularity']
                     results_df.columns = ['Titre', 'Artiste', 'Popularité']
@@ -271,5 +326,19 @@ def show_discovery_recommendations(df):
                 # Option pour créer une playlist Spotify
                 if st.button("Créer une playlist de découvertes sur Spotify", type="secondary"):
                     st.warning("Fonctionnalité de création de playlist en cours de développement")
+
+                # Option pour exporter en CSV avec importation différée
+                if st.button("Exporter en CSV", type="secondary"):
+                    try:
+                        # Importation différée de export_playlist_to_csv
+                        from spotify_playlist_export import export_playlist_to_csv
+                        export_path = export_playlist_to_csv(
+                            discoveries,
+                            f"decouvertes_{discovery_type_value}"
+                        )
+                        if export_path:
+                            st.success(f"Playlist exportée: {os.path.basename(export_path)}")
+                    except Exception as e:
+                        st.error(f"Erreur lors de l'exportation: {str(e)}")
             else:
                 st.error("Aucune découverte n'a pu être générée. Veuillez réessayer.")

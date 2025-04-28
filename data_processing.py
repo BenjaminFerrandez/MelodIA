@@ -18,7 +18,16 @@ def load_data(merged=True):
         return None
 
 
-def clean_data(df):
+def clean_data(df, deep_clean=False):
+    if deep_clean:
+        print("Nettoyage profond des données...")
+        # Approche simplifiée pour éviter les problèmes de récursion
+        # Utiliser uniquement les colonnes essentielles
+        essential_cols = ['track_id', 'track_name', 'artist_name', 'album_name']
+        if all(col in df.columns for col in essential_cols):
+            df = df[essential_cols + [col for col in df.columns if
+                                      col not in essential_cols and col in ['danceability', 'energy', 'valence',
+                                                                            'acousticness']]]
     """Nettoie et prépare les données pour l'analyse"""
     if df is None or df.empty:
         return None
@@ -119,14 +128,14 @@ def clean_data(df):
     return cleaned_df
 
 
-def process_data():
+def process_data(force_rebuild=False):
     """Fonction principale pour charger et nettoyer les données"""
     # Charger les données
     df = load_data()
 
     if df is not None:
         # Nettoyer les données
-        cleaned_df = clean_data(df)
+        cleaned_df = clean_data(df) if not force_rebuild else clean_data(df, deep_clean=True)
         return cleaned_df
     else:
         return None

@@ -1,0 +1,226 @@
+/* Amélioration de la réactivité et du style */
+/* Variables de couleur */
+:root {
+    --spotify-green: #1DB954;
+    --spotify-black: #121212;
+    --spotify-dark-gray: #181818;
+    --spotify-medium-gray: #282828;
+    --spotify-light-gray: #B3B3B3;
+    --spotify-white: #FFFFFF;
+}
+
+/* Style global */
+body {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--spotify-black);
+    color: var(--spotify-white);
+}
+
+.stApp {
+    background-color: var(--spotify-black);
+}
+
+/* Ajustements pour les écrans mobiles */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.8rem !important;
+    }
+
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    .stButton > button {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Améliorer la visibilité des graphiques */
+    [data-testid="stPlotlyChart"] {
+        max-width: 100% !important;
+        overflow-x: auto;
+    }
+
+    /* Meilleure utilisation de l'espace */
+    .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
+/* En-têtes */
+h1, h2, h3 {
+    color: var(--spotify-green);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+/* Cartes et conteneurs */
+.card {
+    background-color: var(--spotify-medium-gray);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+/* Boutons */
+.stButton > button {
+    border-radius: 500px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    transition: all 0.3s ease !important;
+    letter-spacing: 0.05em !important;
+}
+
+.stButton > button[data-baseweb="button"] {
+    background-color: var(--spotify-green) !important;
+    color: black !important;
+}
+
+.stButton > button[data-baseweb="button"]:hover {
+    background-color: #1ed760 !important;
+    transform: scale(1.03);
+}
+
+/* Améliorations pour la sidebar */
+[data-testid="stSidebar"] {
+    background-color: var(--spotify-dark-gray);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-testid="stSidebar"] [data-testid="stImage"] {
+    margin-bottom: 1rem;
+}
+
+/* DataFrames */
+[data-testid="stTable"] {
+    background-color: var(--spotify-medium-gray);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+[data-testid="stDataFrame"] div[role="grid"] {
+    background-color: var(--spotify-medium-gray);
+    border-radius: 8px;
+    color: var(--spotify-white);
+}
+
+/* Notifications et alertes */
+.stAlert {
+    background-color: var(--spotify-medium-gray) !important;
+    color: var(--spotify-white) !important;
+    border-radius: 8px !important;
+    border-left-color: var(--spotify-green) !important;
+}
+
+/* Onglets */
+.stTabs [data-baseweb="tab-list"] {
+    background-color: var(--spotify-dark-gray);
+    border-radius: 8px 8px 0 0;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background-color: var(--spotify-dark-gray);
+    color: var(--spotify-light-gray);
+    border-radius: 8px 8px 0 0;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: var(--spotify-green) !important;
+    color: black !important;
+}
+
+/* Graphiques et visualisations */
+[data-testid="stPlotlyChart"] {
+    background-color: var(--spotify-medium-gray);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Indicateurs de chargement */
+.stProgress .st-bo {
+    background-color: var(--spotify-green);
+}
+
+/* Animations douces pour les transitions */
+.stApp {
+    opacity: 0;
+    animation: fadeIn 0.3s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Styliser les sliders */
+.stSlider [data-baseweb="slider"] [data-testid="stThumbValue"] {
+    background-color: var(--spotify-green) !important;
+    color: black !important;
+}
+
+.stSlider [data-baseweb="slider"] [data-testid="stTrackHighlight"] {
+    background-color: var(--spotify-green) !important;
+}
+
+/* Améliorations des sélecteurs et formulaires */
+.stSelectbox [data-baseweb="select"] {
+    background-color: var(--spotify-medium-gray);
+    border-radius: 4px;
+}
+
+/* Logo et header */
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.logo-container .logo-icon {
+    font-size: 2rem;
+    color: var(--spotify-green);
+}
+
+.logo-container .logo-text {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--spotify-green);
+}
+
+/* Icônes et badges */
+.icon-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--spotify-medium-gray);
+    padding: 0.25rem 0.75rem;
+    border-radius: 500px;
+    font-weight: 500;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.icon-badge .icon {
+    color: var(--spotify-green);
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    color: var(--spotify-light-gray);
+}
