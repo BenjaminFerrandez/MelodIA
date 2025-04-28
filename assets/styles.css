@@ -1,0 +1,158 @@
+/* Styles généraux */
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #121212;
+    color: #FFFFFF;
+}
+
+.stApp {
+    background-color: #121212;
+}
+
+/* En-têtes */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+h1 {
+    color: #1DB954;
+    font-size: 2.5rem;
+}
+
+h2 {
+    color: #1DB954;
+    font-size: 1.8rem;
+}
+
+h3 {
+    color: #FFFFFF;
+    font-size: 1.4rem;
+    border-bottom: 1px solid #333333;
+    padding-bottom: 0.5rem;
+}
+
+/* Liens */
+a {
+    color: #1DB954;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #1ED760;
+    text-decoration: underline;
+}
+
+/* Boutons */
+.stButton > button {
+    border-radius: 500px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.stButton > button[data-baseweb="button"] {
+    background-color: #1DB954;
+    color: #000000;
+}
+
+.stButton > button[data-baseweb="button"]:hover {
+    background-color: #1ED760;
+    transform: scale(1.04);
+}
+
+/* Sidebar */
+.css-1d391kg, .css-163ttbj, .css-1wrcr25 {
+    background-color: #181818;
+}
+
+/* Cartes et conteneurs */
+.stCard {
+    background-color: #282828;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Métriques */
+div[data-testid="stMetric"] {
+    background-color: #282828;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+div[data-testid="stMetric"] > div:first-child {
+    color: #1DB954;
+}
+
+div[data-testid="stMetricLabel"] {
+    color: #BBBBBB;
+}
+
+/* DataFrames */
+div[data-testid="stDataFrame"] div[role="grid"] {
+    background-color: #282828;
+    border-radius: 8px;
+    color: #FFFFFF;
+}
+
+/* Sélecteurs */
+div[data-baseweb="select"] {
+    background-color: #282828;
+    border-radius: 8px;
+}
+
+/* Onglets */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background-color: #282828;
+    border-radius: 4px 4px 0 0;
+    color: #BBBBBB;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: #1DB954 !important;
+    color: #000000 !important;
+}
+
+/* Sliders */
+.stSlider {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.stSlider div[data-baseweb="slider"] div {
+    background-color: #1DB954;
+}
+
+/* Info, warning, success et error widgets */
+.stAlert {
+    background-color: #282828;
+    border-radius: 8px;
+}
+
+/* Progress bar */
+div[role="progressbar"] {
+    background-color: #1DB954;
+}
+
+/* Expanders */
+.streamlit-expanderHeader {
+    font-size: 1.1rem;
+    color: #FFFFFF;
+    background-color: #282828;
+    border-radius: 8px;
+}
+
+/* Charts */
+[data-testid="stPlotlyChart"] {
+    background-color: #282828;
+    border-radius: 8px;
+    padding: 1rem;
+}

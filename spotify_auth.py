@@ -6,7 +6,6 @@ from config import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_UR
 # Scope complet pour toutes les fonctionnalités
 SPOTIFY_FULL_SCOPE = "user-library-read user-top-read playlist-read-private playlist-modify-private user-read-recently-played"
 
-
 class SpotifyAuth:
     _instance = None
 
@@ -31,14 +30,19 @@ class SpotifyAuth:
             except Exception as e:
                 print(f"Impossible de supprimer le cache: {e}")
 
+        # Utiliser exactement l'URI configuré dans le tableau de bord Spotify
+        redirect_uri = SPOTIFY_REDIRECT_URI
+        print(f"Utilisation de l'URI de redirection: {redirect_uri}")
+
         # Création du gestionnaire d'authentification
         self.auth_manager = SpotifyOAuth(
             client_id=SPOTIFY_CLIENT_ID,
             client_secret=SPOTIFY_CLIENT_SECRET,
-            redirect_uri=SPOTIFY_REDIRECT_URI,
+            redirect_uri=redirect_uri,
             scope=SPOTIFY_FULL_SCOPE,
             cache_path=self.cache_path,
-            show_dialog=force_new_auth
+            show_dialog=force_new_auth,
+            open_browser=True
         )
 
         self.sp = spotipy.Spotify(auth_manager=self.auth_manager)
@@ -63,15 +67,6 @@ class SpotifyAuth:
             if os.path.exists(self.cache_path):
                 os.remove(self.cache_path)
                 print(f"Fichier cache supprimé: {os.path.basename(self.cache_path)}")
-
-            # Chercher et supprimer les jetons dans le répertoire courant aussi
-            for file in os.listdir(os.path.dirname(os.path.abspath(__file__))):
-                if '.cache' in file:
-                    try:
-                        os.remove(os.path.join(os.path.dirname(os.path.abspath(__file__)), file))
-                        print(f"Fichier cache supprimé: {file}")
-                    except Exception as e:
-                        print(f"Erreur lors de la suppression de {file}: {e}")
 
             # Réinitialiser l'instance Singleton
             SpotifyAuth._instance = None
