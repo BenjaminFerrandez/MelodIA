@@ -3,6 +3,11 @@ import numpy as np
 import os
 from config import DATA_DIR
 
+# Variable globale pour suivre la profondeur de récursion
+_recursion_depth = 0
+# Cache pour éviter de recalculer les mêmes données
+_analysis_cache = {}
+
 
 def load_data():
     """Charge les données depuis les fichiers disponibles"""
@@ -167,15 +172,31 @@ def categorize_music(df):
     return result_df
 
 
-def analyze_data():
+def analyze_data(max_recursion_depth=1000):
     """Fonction principale pour analyser les données"""
-    print("Démarrage de l'analyse de données...")
+    global _recursion_depth, _analysis_cache
 
-    # Charger les données
+    # Vérifier si nous avons déjà les résultats en cache
+    cache_key = "analysis_results"
+    if cache_key in _analysis_cache:
+        print("Utilisation des résultats d'analyse en cache.")
+        return _analysis_cache[cache_key]
+
+    # Vérifier si nous sommes dans une récursion trop profonde
+    _recursion_depth += 1
+    if _recursion_depth > max_recursion_depth:
+        print(f"ERREUR: Profondeur de récursion maximale dépassée ({max_recursion_depth})")
+        _recursion_depth -= 1
+        return None, None, None
+
+    print(f"Démarrage de l'analyse de données... (profondeur: {_recursion_depth})")
+
+    # Charger les données - Importation locale pour éviter les problèmes d'importation circulaire
     df = load_data()
 
     if df is None:
         print("ERREUR: Aucune donnée disponible pour l'analyse.")
+        _recursion_depth -= 1
         return None, None, None
 
     # Vérifier que les colonnes minimales sont présentes
@@ -184,6 +205,7 @@ def analyze_data():
 
     if missing_cols:
         print(f"ERREUR: Colonnes requises manquantes: {missing_cols}")
+        _recursion_depth -= 1
         return None, None, None
 
     print(f"Analyse en cours pour {len(df)} titres...")
@@ -202,7 +224,13 @@ def analyze_data():
         print("Catégorisation des titres terminée.")
 
         print("Analyse complète terminée avec succès.")
-        return stats, audio_analysis, categorized_df
+
+        # Stocker les résultats en cache
+        result = (stats, audio_analysis, categorized_df)
+        _analysis_cache[cache_key] = result
+
+        _recursion_depth -= 1
+        return result
 
     except Exception as e:
         print(f"ERREUR pendant l'analyse: {e}")
@@ -210,6 +238,7 @@ def analyze_data():
         traceback.print_exc()
 
         # En cas d'erreur, essayer de retourner ce qui a été calculé jusqu'à présent
+        _recursion_depth -= 1
         return (
             get_basic_stats(df) if 'stats' not in locals() else stats,
             None if 'audio_analysis' not in locals() else audio_analysis,
