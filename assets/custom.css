@@ -335,3 +335,49 @@ h1, h2, h3 {
     font-size: 0.8rem;
     color: white !important;
 }
+
+/* CORRECTION POUR LES BOUTONS - Assure que le texte est visible */
+button,
+.stButton button,
+.stButton > button,
+button[type="primary"],
+button[type="secondary"] {
+    color: black !important;
+}
+
+/* Fix pour les boutons primaires */
+.stButton > button[data-baseweb="button"],
+button[data-baseweb="button"] {
+    background-color: var(--spotify-green) !important;
+    color: black !important;
+}
+
+/* Fix pour les boutons secondaires */
+button[kind="secondary"] {
+    background-color: #444444 !important;
+    color: white !important;
+}
+
+/* Renforcement pour tous les types de boutons */
+.stButton > button span,
+.stButton > button div,
+[role="button"] span,
+[role="button"] div {
+    color: inherit !important;
+}
+
+/* Assurez que le texte dans les boutons reste visible */
+.stButton button > div,
+.stButton button span,
+button > div,
+button span {
+    color: inherit !important;
+}
+
+/* Pour les boutons de navigation, assurons qu'ils sont bien visibles */
+[data-baseweb="tab"] {
+    color: white !important;
+}
+[data-baseweb="tab"][aria-selected="true"] {
+    color: black !important;
+}
